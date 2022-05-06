@@ -2,8 +2,10 @@ package main
 
 import (
 	"crypto/md5"
+	"errors"
 	"fmt"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -68,6 +70,50 @@ func printMsg(w http.ResponseWriter, msg ...any) {
 	}
 }
 
+func uploadFile(r *http.Request, outDir, key string) (infos []Infos, e error) {
+	var fhs, ok = r.MultipartForm.File[key]
+	if !ok {
+		e = errors.New(key + "not found!")
+		return
+	}
+	for _, fh := range fhs {
+		var f io.ReadCloser
+		f, e = fh.Open()
+		if e != nil {
+			return
+		}
+		var sPath = outDir + "/" + fh.Filename
+		var info = Infos{
+			Href:    sPath,
+			Message: fh.Filename,
+		}
+		e = upload(f, sPath)
+		if e != nil {
+			return
+		}
+		e = f.Close()
+		if e != nil {
+			return
+		}
+		infos = append(infos, info)
+	}
+	return
+}
+
+func upload(file io.Reader, dest string) error {
+	var f, err = os.Create(dest)
+	if err != nil {
+		return err
+	}
+	_, err = io.Copy(f, file)
+	if err == nil {
+		err = f.Close()
+	} else {
+		_ = f.Close()
+	}
+	return err
+}
+
 func homepage(w http.ResponseWriter, r *http.Request) {
 	var t *template.Template
 	//解析url传递的参数，对于POST则解析响应包的主体（request body）
@@ -115,41 +161,39 @@ func kinship(w http.ResponseWriter, r *http.Request) {
 
 		logRequest(r)
 
-		var workdir = filepath.Join("public", "kinship", Info.Token)
+		var outDir = "public/" + Info.Title + "/" + Info.Token
+		var workdir = filepath.Join("public", Info.Title, Info.Token)
 		err = os.MkdirAll(workdir, 0755)
 		if err != nil {
 			printMsg(w, err)
 			return
 		}
 
-		// 获取上传的信息
-		var info = r.FormValue("info")
-		var infoPath = filepath.Join(workdir, "info")
-		var infoFile *os.File
-		infoFile, err = os.Create(infoPath)
+		var childInfos, fatherInfos, motherInfos []Infos
+		childInfos, err = uploadFile(r, outDir, "child")
 		if err != nil {
 			printMsg(w, err)
 			return
 		}
-		_, err = fmt.Fprint(infoFile, info)
+		fatherInfos, err = uploadFile(r, outDir, "father")
 		if err != nil {
 			printMsg(w, err)
 			return
 		}
-		err = infoFile.Close()
+		motherInfos, err = uploadFile(r, outDir, "mother")
 		if err != nil {
 			printMsg(w, err)
 			return
 		}
-		log.Println(info)
 
-		var script = "src/kinship.sh"
 		var cmd = []string{
-			script,
-			"public/kinship/" + Info.Token,
-			"public/kinship/" + Info.Token + "/info",
+			"-m", "ss",
+			"--child", childInfos[0].Href,
+			"--father", fatherInfos[0].Href,
+			"--mother", motherInfos[0].Href,
+			"--out", filepath.Join(workdir, Info.Title),
 		}
-		var run = exec.Command("bash", cmd...)
+		var run = exec.Command("python3", cmd...)
 		log.Println(run.String())
 		log.Printf("PYTHONPATH:%s\n", os.Getenv("PYTHONPATH"))
 		err = os.Setenv("PYTHONPATH", srcPath)
@@ -164,7 +208,7 @@ func kinship(w http.ResponseWriter, r *http.Request) {
 			printMsg(w, string(output)+"\n", err)
 			return
 		} else {
-			http.Redirect(w, r, filepath.Join(workdir, "kinship"), http.StatusSeeOther)
+			http.Redirect(w, r, filepath.Join(workdir, Info.Title), http.StatusSeeOther)
 			return
 		}
 	} else {
