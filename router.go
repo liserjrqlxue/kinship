@@ -169,8 +169,8 @@ func kinship(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		var childInfos, fatherInfos, motherInfos []Infos
-		childInfos, err = uploadFile(r, outDir, "child")
+		var probandInfos, fatherInfos, motherInfos []Infos
+		probandInfos, err = uploadFile(r, outDir, "proband")
 		if err != nil {
 			printMsg(w, err)
 			return
@@ -188,12 +188,12 @@ func kinship(w http.ResponseWriter, r *http.Request) {
 
 		var cmd = []string{
 			"-m", "ss",
-			"--child", childInfos[0].Href,
-			"--father", fatherInfos[0].Href,
-			"--mother", motherInfos[0].Href,
-			"--out", filepath.Join(workdir, Info.Title),
+			"--child", probandInfos[0].Href,
+			"--dad", fatherInfos[0].Href,
+			"--mom", motherInfos[0].Href,
+			"--out", outDir + "/" + Info.Title,
 		}
-		var run = exec.Command("python3", cmd...)
+		var run = exec.Command("python", cmd...)
 		log.Println(run.String())
 		log.Printf("PYTHONPATH:%s\n", os.Getenv("PYTHONPATH"))
 		err = os.Setenv("PYTHONPATH", srcPath)
