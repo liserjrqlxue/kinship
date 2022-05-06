@@ -1,0 +1,16 @@
+{{define "Kinship"}}
+{{template "header" .}}
+<div class="card-body container">
+<fieldset class="form-control">
+<legend>亲缘关系分析</legend>
+<form enctype="multipart/form-data" action="/kinship" method="post">
+	<div class="col-sm-12 col-form-label"> 每行一个VCF路径，按先证者，父，母，顺序排列</div><br>
+    <textarea class="form-control" rows="3" cols="50" id="info" name="info" placeholder="sampleID"></textarea>
+    <br>
+    <input class="btn btn-primary btn-block" type="submit" value="提交"></input>
+	<br>
+</form>
+</fieldset>
+</div>
+{{template "footer" .}}
+{{end}}

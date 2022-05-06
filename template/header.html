@@ -1,0 +1,37 @@
+{{define "header"}}
+<!doctype html>
+<html lang="en">
+<head>
+    <title>{{.Title}}</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.css" />
+</head>
+<style>
+    html,
+    body {
+        overflow-x: hidden; /* Prevent scroll on narrow devices */
+    }
+    body {
+        padding-top: 70px;
+    }
+</style>
+<script src="/static/js/jquery-3.3.1.js"></script>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="/">Toolkit</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/">Home<span class="sr-only">Home</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="login" href="/kinship" >亲缘关系<span class="sr-only">亲缘关系</span></a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+{{end}}
