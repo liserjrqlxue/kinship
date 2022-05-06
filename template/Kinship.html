@@ -1,16 +1,31 @@
 {{define "Kinship"}}
 {{template "header" .}}
-<div class="card-body container">
-<fieldset class="form-control">
+<div class="container-fluid">
 <legend>亲缘关系分析</legend>
-<form enctype="multipart/form-data" action="/kinship" method="post">
-	<div class="col-sm-12 col-form-label"> 每行一个VCF路径，按先证者，父，母，顺序排列</div><br>
-    <textarea class="form-control" rows="3" cols="50" id="info" name="info" placeholder="sampleID"></textarea>
-    <br>
+<form enctype="multipart/form-data" action="/kinship" method="post" target="_blank">
+	<input type="hidden" name="token" value="{{.Token}}"/>
+	<div class="col-sm-12 col-form-label">按先证者，父，母，顺序上传VCF文件</div><br>
+	<div class="mb-3 input-group">
+		<div class="input-group-prepend">
+			<div class="input-group-text">先证者</div>
+		</div>
+		<input class="form-control" type="file" id="proband" name="proband">
+	</div>
+	<div class="mb-3 input-group">
+		<div class="input-group-prepend">
+			<div class="input-group-text">父亲</div>
+		</div>
+		<input class="form-control" type="file" id="father" name="father">
+	</div>
+	<div class="mb-3 input-group">
+		<div class="input-group-prepend">
+			<div class="input-group-text">母亲</div>
+		</div>
+		<input class="form-control" type="file" id="mother" name="mother" placeholder="母亲.vcf.gz">
+	</div>
     <input class="btn btn-primary btn-block" type="submit" value="提交"></input>
 	<br>
 </form>
-</fieldset>
 </div>
 {{template "footer" .}}
 {{end}}
