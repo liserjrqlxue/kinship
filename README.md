@@ -12,3 +12,11 @@ go build
 ```
 ./kinship -port :9091
 ```
+
+## requirements
+
+- python3
+  - pandas
+  - openpyxl
+- ngs-bits
+  - SampleSimilarity
