@@ -197,11 +197,17 @@ func kinship(w http.ResponseWriter, r *http.Request) {
 		log.Println(run.String())
 		log.Printf("PYTHONPATH:%s\n", os.Getenv("PYTHONPATH"))
 		err = os.Setenv("PYTHONPATH", srcPath)
-		log.Printf("PYTHONPATH:%s\n", os.Getenv("PYTHONPATH"))
 		if err != nil {
 			printMsg(w, err)
 			return
 		}
+		log.Printf("PYTHONPATH:%s\n", os.Getenv("PYTHONPATH"))
+		err = os.Setenv("PATH", srcPath+"/ss/bin:"+os.Getenv("PATH"))
+		if err != nil {
+			printMsg(w, err)
+			return
+		}
+		log.Printf("PATH:%s\n", os.Getenv("PATH"))
 		var output []byte
 		output, err = run.CombinedOutput()
 		if err != nil {
