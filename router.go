@@ -187,7 +187,7 @@ func kinship(w http.ResponseWriter, r *http.Request) {
 		}
 
 		var cmd = []string{
-			"-m", "ss",
+			"-m", "ss.ibd",
 			"--child", probandInfos[0].Href,
 			"--dad", fatherInfos[0].Href,
 			"--mom", motherInfos[0].Href,
